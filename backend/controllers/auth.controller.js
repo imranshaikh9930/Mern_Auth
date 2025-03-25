@@ -17,8 +17,8 @@ cloudinary.config({
 });
 
 const registerController = async (req, res) => {
-    console.log("Received body:", req.body);
-    console.log("Received file:", req.file)
+    // console.log("Received body:", req.body);
+    // console.log("Received file:", req.file)
     try {
         const { name, email, password } = req.body;
         // console.log(req);
