@@ -88,6 +88,10 @@ const AuthForm = () => {
               onChange={handleChange}
               required={!isLogin}
             />
+            {
+              formData.email && 
+        <p style={{color:"red"}}>Email is Required</p>
+            }
           </div>
         )}
         <div className="input_container">
@@ -127,7 +131,7 @@ const AuthForm = () => {
         </button>
         <p className="switch_text">
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-          <span className="switch_link " onClick={() => setIsLogin(!isLogin)}>
+          <span className="switch_link" onClick={() => setIsLogin(!isLogin)}>
             {isLogin ? "Sign Up" : "Sign In"}
           </span>
         </p>
