@@ -6,6 +6,7 @@ import "./ForgotPassword.css";
 const ResetPassword = lazy(()=> import("./ResetPassword"));
 const VerifyOtp = lazy(()=>import ("./VerifyOtp"));
 import Loader from "./Loader";
+import { useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -14,6 +15,7 @@ const ForgotPassword = () => {
   const [step, setStep] = useState(1);
   const [loading,setLoading] = useState(false);
   const inputRefs = useRef([]);
+  const navigate = useNavigate();
 
   // handleOtp Send
 
@@ -71,25 +73,30 @@ const ForgotPassword = () => {
     }
   };
 
-  const handleResetPassword = async () => {
-    try {
-      const resp = await api.post(
-        "/reset-password",
-        { email, newPassword },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await resp.data;
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
 
-      console.log(data.message);
-      setStep(1);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  try {
+    const resp = await api.post(
+      "/reset-password",
+      { email, newPassword },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    
+    const data = resp.data;
+    console.log(data.message);
+
+    navigate("/register"); // Optional: maybe better to go to /login
+    setStep(1); // Reset step
+  } catch (err) {
+    console.log(err.response?.data?.message || "Something went wrong");
+  }
+};
+
   return (
     <div>
      <Suspense fallback={<><Loader/></>}>

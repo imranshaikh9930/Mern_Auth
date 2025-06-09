@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: "http://localhost:8080/auth",
+    baseURL: "https://mern-auth-1-pavq.onrender.com/auth",
 })
 
 export const googleAuth = (code)=> api.get(`/google?code=${code}`)
