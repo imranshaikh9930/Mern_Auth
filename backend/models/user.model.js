@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema({
     image:{
         type:String
     },
+    // RBAC
+    role:{
+        type:String,
+        enum:["admin","user","moderator"],
+        default:"user"
+    },
     otp: { type: String }, 
     otpExpires: { type: Date }
 },{timestamps:true});

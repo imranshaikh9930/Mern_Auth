@@ -9,6 +9,7 @@ require("dotenv").config();
 const { oauth2Client } = require("../utils/googleClient");
 const otpGenerator = require("../utils/otpGenerator");
 const transporter = require("../utils/transporter");
+const userModel = require("../models/user.model");
 // Configure Cloudinary
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -20,7 +21,7 @@ const registerController = async (req, res) => {
     // console.log("Received body:", req.body);
     // console.log("Received file:", req.file)
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password,role } = req.body;
         // console.log(req);
         const file = req.file; // Uploaded file
 
@@ -45,7 +46,8 @@ const registerController = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            image: uploadedImage.secure_url
+            image: uploadedImage.secure_url,
+            role
         });
 
         await newUser.save();
@@ -224,11 +226,49 @@ const resetPassword = async(req,res)=>{
         res.status(500).json({ error: error.message });
       }
 }
+const resendOTP = async(req,res)=>{
+    // email check
+    const {email} = req.body;
+    console.log("email",email)
+    if(!email){
+        return res.status(400).json({message:"Email is required"});
+    }
+    try{
+
+    
+
+        // set Otp
+         const otp = otpGenerator();
+
+         const expiresAt= new Date(Date.now() + 5 * 60*1000)
+
+         await userModel.findOneAndUpdate(
+            {email},
+            {otp,
+                otpExpires:expiresAt
+            },
+            {upsert:true,new:true}
+         )
+          await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Password Reset OTP",
+            text: `Your OTP for password reset is ${otp}. It will expire in 5 minutes.`,
+        });
+            res.status(200).json({ message: "OTP resent successfully" });
+
+         
+    }catch(err){
+        res.status(500).json({error:error.message});
+
+    }
+}
 module.exports = {
     googleController,
     registerController,
     loginController,
     forgotPassword,
     verifyOTP,
-    resetPassword
+    resetPassword,
+    resendOTP
 };

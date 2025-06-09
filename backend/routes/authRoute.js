@@ -1,8 +1,10 @@
 const express  = require("express");
 const multer = require("multer");
 const nodemailer =require("nodemailer");
+const authorizeRole = require("../middleware/authorizeRole");
 const path = require('path');
-const {googleController,registerController,loginController,forgotPassword,verifyOTP,resetPassword} = require('../controllers/auth.controller');
+const {googleController,registerController,loginController,forgotPassword,verifyOTP,resetPassword,resendOTP} = require('../controllers/auth.controller');
+const userModel = require("../models/user.model");
 const router = express.Router();
 
 
@@ -43,8 +45,26 @@ const upload = multer({
 router.get("/google",googleController);
 router.post("/register",upload.single("image"),registerController);
 router.post("/login",upload.single("image"),loginController);
+
+// RBAC
+router.post("/admin/create-user",authorizeRole("admin"),async(req,res)=>{
+
+    try{
+        const {name,email,password,role} = req.body;
+        const hashedPassword = await bcrypt.hash(password,process.env.SALT);
+        const newUser = new userModel()
+        await newUser.save();
+        res.status(201).json({message:"Admin created new user"})
+
+
+    }catch(err){
+        res.status(500).json({message:"internal server error"})
+    }
+})
+
 router.post("/forgot-password",forgotPassword);
 router.post("/verify-otp",verifyOTP);
 router.post("/reset-password",resetPassword);
+router.post("/resend-otp",resendOTP);
 
 module.exports = router

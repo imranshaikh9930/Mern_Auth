@@ -15,7 +15,7 @@ const GoogleLogin = () => {
         const { email, name, img } = result.data.user;
         const token = result.data.token;
 
-        const userInfo = { email, name, token, image };
+        const userInfo = { email, name, token, img };
         localStorage.setItem("user-info", JSON.stringify(userInfo));
 
         toast.success("Login SuccessFul")

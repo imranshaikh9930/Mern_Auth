@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import defaultImg from "./assets/default.png"
 // import "./Dashboard.css"; // Import external CSS
 
 const Dashboard = () => {
@@ -14,6 +15,7 @@ const Dashboard = () => {
         }
     }, []);
 
+   
     const handleLogOut = () => {
         localStorage.removeItem("user-info");
         toast.success("Logout Successful");
@@ -28,9 +30,9 @@ const Dashboard = () => {
             <div className="dashboard-card">
                 {userInfo ? (
                     <>
-                    <h2>User DashBoard</h2>
+                    <h2>{userInfo.user?.role === "admin" ? "Admin Dashboard":"User DashBoard"}</h2>
                         <img
-                            src={userInfo?.user?.image || userInfo?.image || "https://via.placeholder.com/150"}
+                            src={userInfo?.user?.image || userInfo?.image || defaultImg}
                             alt={userInfo?.user?.name || userInfo?.name || "User"}
                             className="profile-img"
                         />

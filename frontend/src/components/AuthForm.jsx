@@ -16,59 +16,82 @@ const AuthForm = () => {
     name: "",
     image: null,
   });
+  const [errors,setErrors] = useState({});
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors((prev)=>({
+      ...prev,
+      [e.target.name]:""
+    }
+  ))
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      if (isLogin) {
-        // Login API call
-        // console.log("Logging in with:", formData);
-        const response = await api.post("/login", {
-          email: formData.email,
-          password: formData.password,
-        });
+  const newErrors = {};
+  if (!isLogin && !formData.name.trim()) {
+    newErrors.name = "Name is required";
+  }
+  if (!formData.email.trim()) {
+    newErrors.email = "Email is required";
+  }
+  if (!formData.password.trim()) {
+    newErrors.password = "Password is required";
+  }
+  if (!isLogin && !formData.image) {
+    newErrors.image = "Image is required";
+  }
 
-        // console.log("Login successful:", response.data);
-        localStorage.setItem(
-          "user-info",
-          JSON.stringify({
-            token: response.data.token,
-            user: response.data.user,
-          })
-        );
-        toast.success("Login SuccessFul;")
-        navigate("/dashboard");
-      } else {
-        // Registration API call
-        console.log("Registering with:", formData);
-        const formDataToSend = new FormData();
-        formDataToSend.append("name", formData.name);
-        formDataToSend.append("email", formData.email);
-        formDataToSend.append("password", formData.password);
-        if (formData.image) {
-          formDataToSend.append("image", formData.image);
-        }
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    toast.error("Please fill in all required fields");
+    return;
+  }
 
-        const response = await api.post("/register", formDataToSend, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+  try {
+    if (isLogin) {
+      // Login
+      const response = await api.post("/login", {
+        email: formData.email,
+        password: formData.password,
+      });
 
-        toast.success("Register SuccessFul;")
-        console.log("Registration successful:", response.data);
-        setIsLogin(true); // Switch to login after successful registration
+      localStorage.setItem(
+        "user-info",
+        JSON.stringify({
+          token: response.data.token,
+          user: response.data.user,
+        })
+      );
+      toast.success("Login Successful");
+      navigate("/dashboard");
+    } else {
+      // Register
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("password", formData.password);
+      if (formData.image) {
+        formDataToSend.append("image", formData.image);
       }
-    } catch (error) {
-      
-      toast.error( error.response.data.message);
+
+      const response = await api.post("/register", formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      toast.success("Registration Successful");
+      setIsLogin(true); // Move to login form
     }
-  };
+  } catch (error) {
+    toast.error(error?.response?.data?.message || "Something went wrong");
+  }
+};
+
 
   return (
     <div className="main-container">
@@ -89,8 +112,8 @@ const AuthForm = () => {
               required={!isLogin}
             />
             {
-              formData.email && 
-        <p style={{color:"red"}}>Email is Required</p>
+              errors.email && 
+        <p style={{color:"red",fontSize:"12px"}}>Name is Required</p>
             }
           </div>
         )}
@@ -105,6 +128,10 @@ const AuthForm = () => {
             onChange={handleChange}
             
           />
+           {
+              errors.email && 
+        <p style={{color:"red",fontSize:"12px"}}>Email is Required</p>
+            }
         </div>
         <div className="input_container">
           <label className="input_label">Password*</label>
@@ -117,6 +144,10 @@ const AuthForm = () => {
             onChange={handleChange}
             
           />
+           {
+              errors.password && 
+        <p style={{color:"red",fontSize:"12px"}}>Password is Required</p>
+            }
         </div>
         {!isLogin && (
           <div className="input_container">

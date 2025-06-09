@@ -7,7 +7,6 @@ import Dashboard from "./Dashboard";
 import RefreshHandler from "./RefreshHandler";
 import AuthForm from "./components/AuthForm";
 import ForgotPassword from "./components/ForgotPassword";
-
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     const userData = localStorage.getItem("user-info");
