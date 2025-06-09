@@ -84,4 +84,4 @@ A complete MERN (MongoDB, Express, React, Node.js) authentication system with:
 └── .env
 
 ```
-https://mern-auth-96ae.vercel.app/register
+https://mern-auth-frontend-wwmy.onrender.com/register
